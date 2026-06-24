@@ -34,11 +34,19 @@
   label.required::after { content: " *"; color: #d33; font-weight: 700; vertical-align: super; font-size: 0.85em; }
 
   input[type="text"], input[type="number"], select {
-    width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; background: #fff; box-sizing: border-box;
-  }
+      width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; background: #fff; box-sizing: border-box;
+      font-size: 16px; /* 모바일 입력창 자동 확대 방지 */
+    }
   input[type="text"]:focus, select:focus { border-color: #2c3e50; outline: none; }
-  input[type="text"].underline-only { border: none; border-bottom: 1px solid #ccc; border-radius: 0; padding: 10px 0; }
-
+  input[type="text"].underline-only { 
+      width: 100%; /* 입력창이 짧아지는 현상 해결 */
+      border: none; 
+      border-bottom: 1px solid #ccc; 
+      border-radius: 0; 
+      padding: 10px 0; 
+      box-sizing: border-box;
+      -webkit-appearance: none; /* 아이폰(Safari) 기본 폼 스타일 간섭 완벽 방지 */
+    }
   /* =========================================================
      상단 안내 및 하이라이트 박스 (복원)
   ========================================================= */
@@ -126,9 +134,9 @@
   
   .qty-price-row { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 15px; }
   .qty-stepper { display: inline-flex; align-items: center; gap: 8px; }
-  .qty-stepper input { width: 60px; padding: 6px 0; text-align: center; border: 1px solid #ccc; font-weight: bold; border-radius: 4px; }
+  .qty-stepper input { width: 60px; padding: 6px 0; text-align: center; border: 1px solid #ccc; font-weight: bold; border-radius: 4px; font-size: 16px; }
   .qty-btn { width: 32px; height: 32px; border: 1px solid #ccc; border-radius: 6px; background: #fff; cursor: pointer; font-size: 16px; }
-  
+
   .dtl-total-price { font-size: 1.3em; font-weight: 800; color: #2c3e50; }
   .btn-add-cart { width: 100%; padding: 14px; background: #2c3e50; color: #fff; border: none; border-radius: 6px; margin-top: 20px; font-size: 1.05em; font-weight: 600; cursor: pointer; transition: 0.2s; }
   .btn-add-cart:hover { background: #1a252f; }
@@ -175,13 +183,13 @@
 <div class="page-wrapper">
 
   <div class="banner">
-    <img src="./assets/header_re2.png" alt="Parnas Hotel Collection" onerror="this.src='https://via.placeholder.com/1000x250?text=Parnas+Hotel+Collection'">
+    <img src="./assets/may_header.png" alt="Parnas Hotel Collection" onerror="this.src='https://via.placeholder.com/1000x250?text=Parnas+Hotel+Collection'">
   </div>
 
   <div class="info-box">
     <div class="info-item info-head"><strong>Parnas Hotel Collection</strong></div>
     <div class="info-item info-head"><strong>Special Offer</strong></div>
-    <div class="info-item"><strong>판매 기간</strong> : ~ 2026.08.31</div>
+    <div class="info-item"><strong>판매 기간</strong> : 2026.05.12 - 05.18.</div>
     <div class="info-item"><strong>문의</strong> : <a href="mailto:newbiz@parnas.co.kr">newbiz@parnas.co.kr</a></div>
     
     <div class="info-sub">
@@ -569,12 +577,12 @@ const shopData = [
     ]
   },
   {
-    category: "Premium Bedding (정가 대비 15% 할인)",
+    category: "Premium Goose Down Duvet Set (정가 대비 40% 할인)",
     items: [
       {
-        id: "b1", name: "구스다운 이불 세트",
+        id: "b1_k", name: "구스다운 이불 세트 (킹)",
         options: [
-          { optName: "킹사이즈 (King)", price: 1487500,
+          { optName: "킹사이즈 (King)", price: 1050000, 
             images: [
               "./assets/Duvet_K.png", 
               "./assets/package.jpg"
@@ -583,7 +591,6 @@ const shopData = [
                   <div class="desc-formatted">
                     <strong class="desc-title">일상을 빛내는 감도 높은 품격</strong>
                     <p>그랜드 인터컨티넨탈 서울 파르나스의 객실 기준을 준용하되, 그레이 파이핑 디테일과 히든 지퍼를 적용해 가정에서의 사용과 관리가 한층 더 편리하도록 리뉴얼했습니다.</p>
-
                     <strong class="desc-subtitle">상품 구성</strong>
                     <ul>
                       <li>킹사이즈 이불 세트: 220x240cm, 1,200g</li>
@@ -591,12 +598,16 @@ const shopData = [
                       <li>이불 커버 1개: 100수, 순면 사틴 원단</li>
                       <li>패브릭 패키지 2개</li>
                     </ul>
-                
                     <p class="desc-note">* 호텔 자수가 새겨진 보관용 패브릭 패키지에 담겨 제공됩니다.</p>
-                    </div>
+                  </div>
                 `
-          },
-          { optName: "퀸사이즈 (Queen)", price: 1428000,
+          }
+        ]
+      },
+      {
+        id: "b1_q", name: "구스다운 이불 세트 (퀸)",
+        options: [
+          { optName: "퀸사이즈 (Queen)", price: 1008000,
             images: [
               "./assets/Duvet_Q.png", 
               "./assets/package.jpg"
@@ -605,7 +616,6 @@ const shopData = [
                   <div class="desc-formatted">
                     <strong class="desc-title">일상을 빛내는 감도 높은 품격</strong>
                     <p>그랜드 인터컨티넨탈 서울 파르나스의 객실 기준을 준용하되, 그레이 파이핑 디테일과 히든 지퍼를 적용해 가정에서의 사용과 관리가 한층 더 편리하도록 리뉴얼했습니다.</p>
-
                     <strong class="desc-subtitle">상품 구성</strong>
                     <ul>
                       <li>퀸사이즈 이불 세트: 200x230cm, 1,100g</li>
@@ -613,12 +623,16 @@ const shopData = [
                       <li>이불 커버 1개: 100수, 순면 사틴 원단</li>
                       <li>패브릭 패키지 2개</li>
                     </ul>
-                
                     <p class="desc-note">* 호텔 자수가 새겨진 보관용 패브릭 패키지에 담겨 제공됩니다.</p>
-                    </div>
+                  </div>
                 `
-          },
-          { optName: "싱글 사이즈 (Single)", price: 1190000,
+          }
+        ]
+      },
+      {
+        id: "b1_s", name: "구스다운 이불 세트 (싱글)",
+        options: [
+          { optName: "싱글 사이즈 (Single)", price: 840000,
             images: [
               "./assets/Duvet_S.png", 
               "./assets/package.jpg"
@@ -627,25 +641,29 @@ const shopData = [
                   <div class="desc-formatted">
                     <strong class="desc-title">일상을 빛내는 감도 높은 품격</strong>
                     <p>그랜드 인터컨티넨탈 서울 파르나스의 객실 기준을 준용하되, 그레이 파이핑 디테일과 히든 지퍼를 적용해 가정에서의 사용과 관리가 한층 더 편리하도록 리뉴얼했습니다.</p>
-
                     <strong class="desc-subtitle">상품 구성</strong>
                     <ul>
-                      <li>퀸사이즈 이불 세트: 200x230cm, 800g</li>
+                      <li>싱글사이즈 이불 세트: 200x230cm, 800g</li>
                       <li>구스다운 이불 1개: 폴란드산 구스(솜털 90%, 깃털 10%), 다운프루프</li>
                       <li>이불 커버 1개: 100수, 순면 사틴 원단</li>
                       <li>패브릭 패키지 2개</li>
                     </ul>
-                
                     <p class="desc-note">* 호텔 자수가 새겨진 보관용 패브릭 패키지에 담겨 제공됩니다.</p>
-                    </div>
+                  </div>
                 `
           }
         ]
-      },
+      }
+    ]
+  },
+  // 2. 베개 세트 카테고리 (할인율 20%로 변경)
+  {
+    category: "Premium Goose Down Pillow Set (정가 대비 20% 할인)",
+    items: [
       {
         id: "b2", name: "구스다운 베개 세트",
         options: [
-          { optName: "프리미엄 (50 x 90)", price: 391000,
+          { optName: "프리미엄 (50 x 90)", price: 368000, // ★ 20% 할인가로 가격 수정 필요
             images: [
               "./assets/Pillow_Premium.png", 
               "./assets/package.jpg"
@@ -654,7 +672,6 @@ const shopData = [
                   <div class="desc-formatted">
                     <strong class="desc-title">일상을 빛내는 감도 높은 품격</strong>
                     <p>그랜드 인터컨티넨탈 서울 파르나스의 객실 기준을 준용하되, 그레이 파이핑 디테일과 히든 지퍼를 적용해 가정에서의 사용과 관리가 한층 더 편리하도록 리뉴얼했습니다.</p>
-
                     <strong class="desc-subtitle">상품 구성</strong>
                     <ul>
                       <li>프리미엄 베개 세트: 50x90cm, 1,300g</li>
@@ -662,12 +679,11 @@ const shopData = [
                       <li>베개 커버 1개: 100수, 순면 사틴 원단</li>
                       <li>패브릭 패키지 2개</li>
                     </ul>
-                
                     <p class="desc-note">* 호텔 자수가 새겨진 보관용 패브릭 패키지에 담겨 제공됩니다.</p>
-                    </div>
+                  </div>
                 `
           },
-          { optName: "킹 (50 x 70)", price: 335750,
+          { optName: "킹 (50 x 70)", price: 316000,
             images: [
               "./assets/Pillow_King.png", 
               "./assets/package.jpg"
@@ -676,7 +692,6 @@ const shopData = [
                   <div class="desc-formatted">
                     <strong class="desc-title">일상을 빛내는 감도 높은 품격</strong>
                     <p>그랜드 인터컨티넨탈 서울 파르나스의 객실 기준을 준용하되, 그레이 파이핑 디테일과 히든 지퍼를 적용해 가정에서의 사용과 관리가 한층 더 편리하도록 리뉴얼했습니다.</p>
-
                     <strong class="desc-subtitle">상품 구성</strong>
                     <ul>
                       <li>킹사이즈 베개 세트: 50x70cm, 1,000g</li>
@@ -684,90 +699,23 @@ const shopData = [
                       <li>베개 커버 1개: 100수, 순면 사틴 원단</li>
                       <li>패브릭 패키지 2개</li>
                     </ul>
-                
                     <p class="desc-note">* 호텔 자수가 새겨진 보관용 패브릭 패키지에 담겨 제공됩니다.</p>
-                    </div>
+                  </div>
                 `
           }
         ]
-      },
-      {
-        id: "b3", name: "베드 시트",
-        options: [
-          { optName: "킹사이즈 (King)", price: 229500,
-            images: [
-              "./assets/Bed_Sheet_K.png", 
-              "./assets/package.jpg"
-            ],
-            optDesc: `
-                  <div class="desc-formatted">
-                    <strong class="desc-title">일상을 빛내는 감도 높은 품격</strong>
-                    <p>그랜드 인터컨티넨탈 서울 파르나스의 객실 기준을 준용하되, 4면 고무 밴드를 적용해 가정에서의 사용과 관리가 한층 더 편리하도록 리뉴얼했습니다.</p>
-
-                    <strong class="desc-subtitle">상품 구성</strong>
-                    <ul>
-                      <li>킹사이즈 베드 시트 1개(고무줄 타입): 170x200cm</li>
-                      <li>패브릭 패키지 1개</li>
-                    </ul>
-
-                    <p class="desc-note">* 매트리스 높이 최대 38cm까지 사용 가능합니다.</p>
-                    <p class="desc-note">* 호텔 자수가 새겨진 보관용 패브릭 패키지에 담겨 제공됩니다.</p>
-                    </div>
-                `
-          },
-          { optName: "퀸 사이즈 (Queen)", price: 212500,
-            images: [
-              "./assets/Bed_Sheet_Q.png", 
-              "./assets/package.jpg"
-            ],
-            optDesc: `
-                  <div class="desc-formatted">
-                    <strong class="desc-title">일상을 빛내는 감도 높은 품격</strong>
-                    <p>그랜드 인터컨티넨탈 서울 파르나스의 객실 기준을 준용하되, 4면 고무 밴드를 적용해 가정에서의 사용과 관리가 한층 더 편리하도록 리뉴얼했습니다.</p>
-
-                    <strong class="desc-subtitle">상품 구성</strong>
-                    <ul>
-                      <li>퀸사이즈 베드 시트 1개(고무줄 타입): 150x200cm</li>
-                      <li>패브릭 패키지 1개</li>
-                    </ul>
-
-                    <p class="desc-note">* 매트리스 높이 최대 38cm까지 사용 가능합니다.</p>
-                    <p class="desc-note">* 호텔 자수가 새겨진 보관용 패브릭 패키지에 담겨 제공됩니다.</p>
-                    </div>
-                `
-          },
-          { optName: "싱글 사이즈 (Single)", price: 178500,
-            images: [
-              "./assets/Bed_Sheet_S.png", 
-              "./assets/package.jpg"
-            ],
-            optDesc: `
-                  <div class="desc-formatted">
-                    <strong class="desc-title">일상을 빛내는 감도 높은 품격</strong>
-                    <p>그랜드 인터컨티넨탈 서울 파르나스의 객실 기준을 준용하되, 4면 고무 밴드를 적용해 가정에서의 사용과 관리가 한층 더 편리하도록 리뉴얼했습니다.</p>
-
-                    <strong class="desc-subtitle">상품 구성</strong>
-                    <ul>
-                      <li>싱글사이즈 베드 시트 1개(고무줄 타입): 110x200cm</li>
-                      <li>패브릭 패키지 1개</li>
-                    </ul>
-
-                    <p class="desc-note">* 매트리스 높이 최대 38cm까지 사용 가능합니다.</p>
-                    <p class="desc-note">* 호텔 자수가 새겨진 보관용 패브릭 패키지에 담겨 제공됩니다.</p>
-                    </div>
-                `
-          }
+      }
         ]
       }
     ]
   },
   {
-    category: "Premium Bathwear (정가 대비 15% 할인)",
+    category: "Premium Bathwear (정가 대비 20% 할인)",
     items: [
       {
         id: "w1", name: "배스로브",
         options: [
-          { optName: "기본 세트 (Free Size, White)", price: 157250,
+          { optName: "기본 세트 (Free Size, White)", price: 148000,
             images: [
               "./assets/Bathrobe.png", 
               "./assets/bathrobe2.jpg"
@@ -794,7 +742,7 @@ const shopData = [
       {
         id: "w2", name: "배스 타월(2개입)",
         options: [
-          { optName: "2개입 세트 (White)", price: 97750,
+          { optName: "2개입 세트 (White)", price: 92000,
             images: [
               "./assets/Bathtowel.png", 
               "./assets/bathtowel2.jpg"
@@ -821,7 +769,7 @@ const shopData = [
       {
         id: "w3", name: "페이스 타월(3개입)",
         options: [
-          { optName: "3개입 세트 (White)", price: 67150,
+          { optName: "3개입 세트 (White)", price: 63200,
             images: [
               "./assets/FaceTowel.png", 
               "./assets/facetowel2.jpg"
