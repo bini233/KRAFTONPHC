@@ -1,1 +1,1224 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Parnas Hotel Collection Special Offer</title>
 
+<style>
+  /* =========================================================
+     기본 폰트 & 레이아웃
+  ========================================================= */
+  body {
+    font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+    margin: 0;
+    padding: 20px;
+    background: #F7F7F7;
+    display: flex;
+    justify-content: center;
+  }
+
+  .page-wrapper {
+    max-width: 1000px;
+    width: 100%;
+    background: #fff;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+  }
+
+  .banner { width: 100%; border-radius: 8px; margin-bottom: 30px; overflow: hidden; }
+  .banner img { width: 100%; height: auto; object-fit: contain; display: block; }
+  h2 { margin-top: 45px; font-size: 1.2em; border-left: 3px solid #2c3e50; padding-left: 10px; color: #2c3e50; }
+  label { display: block; font-weight: 500; margin: 16px 0 6px; }
+  label.required::after { content: " *"; color: #d33; font-weight: 700; vertical-align: super; font-size: 0.85em; }
+
+  input[type="text"], input[type="number"], select {
+    width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; background: #fff; box-sizing: border-box;
+  }
+  input[type="text"]:focus, select:focus { border-color: #2c3e50; outline: none; }
+  input[type="text"].underline-only { border: none; border-bottom: 1px solid #ccc; border-radius: 0; padding: 10px 0; }
+
+  /* =========================================================
+     상단 안내 및 하이라이트 박스 (복원)
+  ========================================================= */
+  .info-box{ text-align: center; margin: 18px 0 10px; padding: 16px 16px; background: #ffffff; border: 1px solid #cfd6dd; border-radius: 10px; color: #2c3e50; line-height: 1.7; }
+  .info-box .info-head{ font-size: 1.5em; margin-bottom: 10px; }
+  .info-box .info-item{ margin: 6px 0; color: #556677; }
+  .info-box .info-item strong{ color: #2c3e50; font-weight: 700; }
+  .info-box .info-sub{ margin-top: 10px; padding-top: 10px; border-top: 1px solid #e4e9ef; color: #556677; font-size: 0.95em; }
+
+  .pay-highlight{ margin-top: 12px; padding: 14px 16px; background: #f7f9fb; border: 1px solid #cfd6dd; border-radius: 10px; color: #2c3e50; line-height: 1.6; }
+  .pay-highlight .pay-note{ margin-top: 6px; font-size: 0.92em; color: #556677; }
+    
+  .bank-highlight{ margin-top: 12px; padding: 14px 16px; background: #f7f9fb; border: 1px solid #cfd6dd; border-radius: 10px; color: #2c3e50; line-height: 1.6; }
+  .bank-highlight .bank-name{ font-weight: 700; }
+  .bank-highlight .bank-amount{ margin-top: 6px; font-weight: 700; font-size: 1.05em; }
+  .bank-highlight .bank-note{ margin-top: 6px; font-size: 0.92em; color: #556677; }
+
+  /* =========================================================
+     카테고리 & 가로 스크롤 리스트
+  ========================================================= */
+  .category-title { font-size: 1.1em; font-weight: 700; color: #333; margin: 30px 0 15px; padding-bottom: 8px; border-bottom: 1px solid #eee; }
+  
+  /* 스크롤 버튼을 위한 래퍼 추가 */
+  .product-list-wrapper { position: relative; }
+  .product-list { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 15px; scrollbar-width: none; }
+  .product-list::-webkit-scrollbar { display: none; }
+  .product-card { min-width: 160px; max-width: 160px; flex-shrink: 0; cursor: pointer; border-radius: 8px; transition: transform 0.2s; }
+  .product-card:hover { transform: translateY(-3px); }
+  .product-card.active .img-container { border: 3px solid #2c3e50; }
+
+  .img-container { width: 100%; height: 160px; background-color: #f5f5f5; border-radius: 8px; overflow: hidden; margin-bottom: 10px; border: 3px solid transparent; transition: border-color 0.2s; }
+  .img-container img { width: 100%; height: 100%; object-fit: cover; }
+  .product-card-title { font-size: 1em; font-weight: 600; color: #333; word-break: keep-all; text-align: center; }
+
+  /* 스크롤 버튼 디자인 추가 */
+  .scroll-btn {
+    position: absolute;
+    top: calc(50% - 15px); /* 패딩값 고려하여 살짝 위로 */
+    transform: translateY(-50%);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #fff;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    cursor: pointer;
+    font-size: 16px;
+    color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+  }
+  .scroll-btn.prev-btn { left: -15px; }
+  .scroll-btn.next-btn { right: -15px; }
+
+  /* =========================================================
+     상세 정보 영역 (좌우 분할 레이아웃)
+  ========================================================= */
+  .detail-container { display: none; background: #fdfdfd; border: 1px solid #e4e9ef; border-radius: 12px; padding: 25px; margin-top: 15px; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+
+  .split-layout { display: flex; gap: 30px; }
+  .detail-left { flex: 1; min-width: 0; }
+  .detail-right { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: space-between; }
+
+  .main-img { width: 100%; height: 300px; object-fit: cover; border-radius: 8px; background: #eee; margin-bottom: 10px; }
+  .thumb-list { display: flex; gap: 10px; }
+  .thumb-img { width: 60px; height: 60px; object-fit: cover; border-radius: 6px; cursor: pointer; border: 2px solid transparent; opacity: 0.6; }
+  .thumb-img:hover, .thumb-img.active { opacity: 1; border-color: #2c3e50; }
+
+  .dtl-title { font-size: 1.4em; font-weight: 700; color: #2c3e50; margin-bottom: 8px; margin-top: 0; }
+  .dtl-desc { font-size: 0.9em; color: #666; margin-bottom: 20px; line-height: 1.5; }
+  
+  .desc-formatted { font-size: 0.95em; color: #444; line-height: 1.6; margin-bottom: 20px; }
+  .desc-formatted .desc-title { display: block; font-size: 1.15em; color: #2c3e50; margin-bottom: 8px; }
+  .desc-formatted p { margin: 0 0 15px 0; word-break: keep-all; }
+  .desc-formatted .desc-subtitle { display: block; font-size: 1.05em; color: #333; margin-bottom: 8px; }
+  .desc-formatted ul { margin: 0 0 15px 0; padding-left: 20px; }
+  .desc-formatted li { margin-bottom: 4px; }
+  .desc-formatted .desc-note { font-size: 0.85em; color: #888; margin-bottom: 0; }
+  
+  .option-box { background: #f7f9fb; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #eee;}
+  .option-box label { margin-top: 0; font-size: 0.9em; color: #444; }
+  
+  .qty-price-row { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 15px; }
+  .qty-stepper { display: inline-flex; align-items: center; gap: 8px; }
+  .qty-stepper input { width: 60px; padding: 6px 0; text-align: center; border: 1px solid #ccc; font-weight: bold; border-radius: 4px; }
+  .qty-btn { width: 32px; height: 32px; border: 1px solid #ccc; border-radius: 6px; background: #fff; cursor: pointer; font-size: 16px; }
+  
+  .dtl-total-price { font-size: 1.3em; font-weight: 800; color: #2c3e50; }
+  .btn-add-cart { width: 100%; padding: 14px; background: #2c3e50; color: #fff; border: none; border-radius: 6px; margin-top: 20px; font-size: 1.05em; font-weight: 600; cursor: pointer; transition: 0.2s; }
+  .btn-add-cart:hover { background: #1a252f; }
+  
+  @media (max-width: 768px) {
+    .split-layout { flex-direction: column; }
+    /* 상세이미지 모바일 비율 5:4로 변경 */
+    .main-img { height: auto; aspect-ratio: 5/4; }
+    .scroll-btn.prev-btn { left: 0px; }
+    .scroll-btn.next-btn { right: 0px; }
+  }
+
+  /* =========================================================
+     장바구니 (선택 내역) & 개인정보 동의 박스 (복원)
+  ========================================================= */
+  .cart-area { margin-top: 40px; }
+  .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #fff; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 10px; }
+  .cart-item-info { flex: 1; }
+  .cart-item-title { font-weight: 700; color: #333; margin-bottom: 4px; }
+  .cart-item-opt { font-size: 0.85em; color: #666; }
+  .cart-item-price { font-weight: 700; color: #2c3e50; margin-left: 15px; }
+  .btn-delete { background: none; border: none; color: #d33; font-size: 1.2em; cursor: pointer; padding: 5px; margin-left: 10px; }
+
+  .total-box { margin-top: 10px; padding: 20px; background: #2c3e50; color: #fff; border-radius: 8px; font-size: 1.2em; display: flex; justify-content: space-between; align-items: center; }
+
+  /* 개인정보 동의 박스 복원 */
+  .consent-box{ margin-top: 28px; padding: 16px 16px; background: #f7f9fb; border: 1px solid #cfd6dd; border-radius: 10px; color: #2c3e50; line-height: 1.65; }
+  .consent-title{ font-weight: 700; margin-bottom: 10px; }
+  .consent-section{ padding-top: 12px; margin-top: 12px; border-top: 1px solid #e4e9ef; }
+  .consent-section:first-child{ border-top: none; margin-top: 0; padding-top: 0; }
+  .consent-subtitle{ font-weight: 700; margin-bottom: 6px; }
+  .consent-list{ margin: 0; padding-left: 18px; color: #556677; font-size: 0.95em; }
+  .consent-check{ display: flex; gap: 10px; align-items: flex-start; margin-top: 10px; padding-top: 8px; }
+  .consent-check input[type="checkbox"]{ margin-top: 4px; width: 18px; height: 18px; accent-color: #2c3e50; }
+  .consent-check label{ margin: 0; font-weight: 600; color: #2c3e50; }
+  .consent-required{ font-size: 0.9em; color: #556677; margin-top: 6px; }
+
+  .hidden { display: none !important; }
+  button[type="submit"] { width: 100%; padding: 16px; background: #2c3e50; color: #fff; border: none; border-radius: 6px; margin-top: 35px; font-size: 1.1em; font-weight: bold; cursor: pointer; }
+</style>
+</head>
+
+<body>
+<div class="page-wrapper">
+
+  <div class="banner">
+    <img src="./assets/header_re2.png" alt="Parnas Hotel Collection" onerror="this.src='https://via.placeholder.com/1000x250?text=Parnas+Hotel+Collection'">
+  </div>
+
+  <div class="info-box">
+    <div class="info-item info-head"><strong>Parnas Hotel Collection</strong></div>
+    <div class="info-item info-head"><strong>Special Offer</strong></div>
+    <div class="info-item"><strong>판매 기간</strong> : ~ 2026.08.31</div>
+    <div class="info-item"><strong>문의</strong> : <a href="mailto:newbiz@parnas.co.kr">newbiz@parnas.co.kr</a></div>
+    
+    <div class="info-sub">
+      <div class="info-item"><strong>온라인 구매</strong></div>
+      <div class="info-item">아래 주문서를 작성 후 제출해주세요.</div>
+      <div class="info-item"><strong>결제 방법</strong> : 계좌이체 또는 카드 결제 링크</div>
+      <div class="info-item">① 계좌이체: 입금 확인 후 순차 출고됩니다.</div>
+      <div class="info-item">② 카드결제: 입력하신 전화번호로 결제 링크를 발송드립니다.</div>
+      <div class="info-item"><strong>배송 안내</strong></div>
+      <div class="info-item">✓ 상품 배송은 영업일 기준 순차적으로 발송됩니다. (주말, 공휴일 제외)</div>
+      <div class="info-item">✓ 기상악화 및 공휴일, 설/추석 연휴 등의 사유로 배송이 지연될 수 있습니다.</div>
+    </div>
+
+    <div class="info-sub">
+      <div class="info-item"><strong>오프라인 구매</strong></div>
+      <div class="info-item">그랜드 인터컨티넨탈 서울 파르나스 1층 파르나스호텔 컬렉션 부티크에서 구매 가능합니다.</div>
+      <div class="info-item">※ 오프라인 구매 시에만 사원증 또는 명함 확인이 필요합니다.</div>
+    </div>
+  </div>
+
+  <form name="phc-special-offer" id="orderForm"
+        method="POST"
+        data-netlify="true"
+        netlify-honeypot="bot-field"
+        action="/thanks/index.html"
+        onsubmit="return validateForm();">
+    
+    <input type="hidden" name="form-name" value="phc-special-offer" />
+    <input type="hidden" name="subject" value="New Order - Parnas Hotel Collection Special Offer" />
+    <p style="display:none;"><label>Don’t fill this out: <input name="bot-field" /></label></p>
+
+    <h2>1. 주문자 정보</h2>
+    <label class="required">주문자 이름</label>
+    <input type="text" name="주문자 이름" class="underline-only" placeholder="예시: 홍길동" required>
+
+    <label class="required">회사 이메일 주소</label>
+    <input type="text" name="회사 이메일 주소" class="underline-only" placeholder="임직원 여부 확인용입니다. 예시: honggildong@company.com" required>
+
+    <h2>2. 구매 상품 선택</h2>
+    <div id="productGalleryArea"></div>
+
+    <div class="cart-area">
+      <h3 style="font-size: 1.1em; color: #2c3e50; margin-bottom: 10px;">선택된 상품 내역</h3>
+      <div id="cartList">
+        <p style="color:#888; font-size:0.9em;">위에서 상품을 선택해 담아주세요.</p>
+      </div>
+      <div class="total-box">
+        <div>총 결제 금액</div>
+        <div><strong id="grandTotal">0</strong>원</div>
+      </div>
+    </div>
+
+    <h2>3. 배송 정보</h2>
+    <label class="required">수취인 이름</label>
+    <input type="text" name="수취인 이름" class="underline-only" placeholder="예시: 홍길동" required>
+
+    <label class="required">수취인 전화번호</label>
+    <input type="text" name="수취인 전화번호" class="phone-input underline-only" inputmode="numeric" placeholder="예시: 01012345678" required>
+
+    <label class="required">수취인 주소</label>
+    <input type="text" name="수취인 주소" class="underline-only" placeholder="예시: 서울시 강남구" required>
+
+    <h2>4. 결제 방식</h2>
+    <label class="required">결제 방식 선택</label>
+    <select name="결제 방식" id="paySelect" required>
+      <option value="">결제 수단 선택</option>
+      <option value="계좌이체">계좌이체</option>
+      <option value="카드결제">카드결제</option>
+    </select>
+    
+    <div id="bankArea" class="hidden">
+      <div class="bank-highlight" id="bankHighlight">
+        <div class="bank-name">입금 계좌: 하나은행 183-910001-24105</div>
+        <div class="bank-amount">입금하실 금액은 <span id="bankTotalText">0</span>원 입니다.</div>
+        <div class="bank-note">결제 확인 후, 영업일 기준으로 순차 출고됩니다.</div>
+      </div>
+      <label class="required">입금자명</label>
+      <input type="text" name="입금자명" class="underline-only" placeholder="예시: 홍길동">
+      <label class="required">입금 금액</label>
+      <input type="text" id="depositAmount" name="입금 금액" inputmode="numeric" class="underline-only" placeholder="총금액과 동일하게 입력">
+    </div>
+
+    <div id="cardArea" class="hidden">
+      <div class="pay-highlight" id="cardHighlight">
+        카드 결제하실 수 있는 결제 링크를 입력해주신 전화번호로 보내드릴 예정입니다.
+        <div class="pay-note">결제 확인 후, 영업일 기준으로 순차 출고됩니다.</div>
+      </div>
+      <label class="required">결제 링크 받으실 전화번호</label>
+      <input type="text" class="phone-input underline-only" name="카드결제 연락처" placeholder="숫자만 입력">
+    </div>
+
+    <h2>5. 현금영수증 / 세금계산서</h2>
+    <label>발행 선택</label>
+    <select id="taxSelect" name="증빙 선택">
+      <option value="">선택 안 함</option>
+      <option value="현금영수증">현금영수증(개인)</option>
+      <option value="세금계산서">세금계산서(기업)</option>
+    </select>
+
+    <div id="taxArea" class="hidden">
+      <div id="cashArea" class="hidden">
+        <label>현금영수증 휴대폰 번호</label>
+        <input type="text" id="cashPhone" name="현금영수증 번호" class="phone-input underline-only" placeholder="숫자만 입력">
+      </div>
+      <div id="invoiceArea" class="hidden">
+        <label>사업자 등록번호 (10자리)</label>
+        <input type="text" id="businessNo" name="사업자등록번호" maxlength="10" class="phone-input underline-only" placeholder="숫자만 입력">
+      </div>
+    </div>
+
+    <div class="consent-box">
+      <div class="consent-title">개인정보 동의</div>
+      
+      <div class="consent-section">
+        <div class="consent-subtitle">1) 개인정보 수집 및 이용 동의</div>
+        <ul class="consent-list">
+          <li>수집하는 개인정보 항목: 주문자 이름, 주문자 이메일, 수취인 이름, 수취인 연락처, 수취인 주소</li>
+          <li>수집 및 이용 목적: 파르나스호텔 컬렉션 상품 주문 취합 및 배송</li>
+          <li>보유 및 이용기간: 배송 완료 후 1개월간 보관 후 폐기</li>
+        </ul>
+        <div class="consent-check">
+          <input type="checkbox" id="agreeCollect" name="개인정보 수집 및 이용 동의" required>
+          <label for="agreeCollect">개인정보 수집 및 이용에 동의합니다. (필수)</label>
+        </div>
+      </div>
+      
+      <div class="consent-section">
+        <div class="consent-subtitle">2) 개인정보 제3자 제공 동의</div>
+        <ul class="consent-list">
+          <li>제공받는 자: 물플</li>
+          <li>제공받는 자의 이용 목적: 파르나스호텔 컬렉션 상품 배송</li>
+          <li>제공하는 항목: 수취인 이름, 수취인 연락처, 수취인 주소</li>
+          <li>제공받는 자의 보유 및 이용기간: 배송 완료 후 1개월간 보관 후 폐기</li>
+        </ul>
+        <div class="consent-check">
+          <input type="checkbox" id="agreeThirdParty" name="개인정보 제3자 제공 동의" required>
+          <label for="agreeThirdParty">개인정보 제3자 제공에 동의합니다. (필수)</label>
+        </div>
+      </div>
+      
+      <div class="consent-required">※ 필수 동의 항목에 체크해야 주문서 제출이 가능합니다.</div>
+    </div>
+
+    <input type="hidden" name="주문 내역" id="orderSummaryInput">
+    <input type="hidden" name="총액" id="totalAmountInput">
+
+    <button type="submit">주문서 제출하기</button>
+  </form>
+</div>
+
+<div id="detailTemplate" class="detail-container">
+  <div class="split-layout">
+    <div class="detail-left">
+      <img id="dtlMainImg" class="main-img" src="" alt="메인 이미지">
+      <div id="dtlThumbList" class="thumb-list"></div>
+    </div>
+    
+    <div class="detail-right">
+      <div>
+        <h3 id="dtlTitle" class="dtl-title">상품명</h3>
+        <p id="dtlDesc" class="dtl-desc">상품 설명이 들어갑니다.</p>
+        
+        <div class="option-box">
+          <label id="dtlOptionLabel">옵션 선택</label>
+          <select id="dtlOptionSelect"></select>
+          
+          <div class="qty-price-row">
+            <div class="qty-stepper">
+              <button type="button" class="qty-btn" id="dtlMinus">−</button>
+              <input type="number" id="dtlQty" min="1" value="1">
+              <button type="button" class="qty-btn" id="dtlPlus">＋</button>
+            </div>
+            <div class="dtl-total-price"><span id="dtlPriceCalc">0</span>원</div>
+          </div>
+        </div>
+      </div>
+      
+      <button type="button" class="btn-add-cart" id="btnAddCart">장바구니 담기</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   데이터 정의 (옵션별로 2개의 이미지 세팅)
+========================================================= */
+const shopData = [
+  {
+    category: "Signature Scent (정가 대비 20% 할인)",
+    items: [
+      {
+        id: "s1", name: "디퓨저",
+        options: [
+          {
+            optName: "Mossy Wood", 
+            price: 76000,
+            images: [
+              "./assets/Mossy_Wood_Diffuser.png", 
+              "./assets/scent bag.jpg"
+            ],
+            optDesc: `
+                  <div class="desc-formatted">
+                    <strong class="desc-title">향기로 전하는 품격, Mossy Wood</strong>
+                    <p>그랜드 인터컨티넨탈 서울 파르나스에서 사용하는 시그니처 향으로, 은은하게 퍼지는 풍부한 아이리스 향과 세련된 우디 노트로 럭셔리한 품격을 전합니다.</p>
+
+                    <strong class="desc-subtitle">상품 구성</strong>
+                    <ul>
+                      <li>디퓨저 본품 200ml</li>
+                      <li>리필 용액 100ml</li>
+                      <li>리드 스틱 8개</li>
+                    </ul>
+                
+                    <p class="desc-note">* 패키지 상자와 선물 포장용 쇼핑백이 함께 제공됩니다.</p>
+                    </div>
+                `
+          },
+          { optName: "Mint Forest", price: 76000,
+            images: [
+              "./assets/Mint_Forest_Diffuser.png", 
+              "./assets/scent bag.jpg"
+            ],
+            optDesc: `
+                  <div class="desc-formatted">
+                    <strong class="desc-title">공간을 감싸는 고요한 싱그러움, Mint Forest</strong>
+                    <p>파르나스 호텔 제주에서 사용하는 시그니처 향으로, 제주의 맑고 부드러운 바람, 푸른 바다의 감동을 향기로 전합니다.</p>
+
+                    <strong class="desc-subtitle">상품 구성</strong>
+                    <ul>
+                      <li>디퓨저 본품 200ml</li>
+                      <li>리필 용액 100ml</li>
+                      <li>리드 스틱 8개</li>
+                    </ul>
+                
+                    <p class="desc-note">* 패키지 상자와 선물 포장용 쇼핑백이 함께 제공됩니다.</p>
+                    </div>
+                `
+          },
+          { optName: "White Bloom", price: 76000,
+            images: [
+              "./assets/White_Bloom_Diffuser.png", 
+              "./assets/scent bag.jpg"
+            ],
+            optDesc: `
+                  <div class="desc-formatted">
+                    <strong class="desc-title">고요함 속에서 피어나는 깊은 평온, White Bloom</strong>
+                    <p>웨스틴 서울 파르나스에서 사용하는 시그니처 향으로, 상쾌한 아침 햇살같은 이탈리안 베르가모트와 포근한 담요처럼 감싸오는 머스크와 앰버의 잔향으로, 잔잔한 활력이 공간을 채웁니다.</p>
+
+                    <strong class="desc-subtitle">상품 구성</strong>
+                    <ul>
+                      <li>디퓨저 본품 200ml</li>
+                      <li>리필 용액 100ml</li>
+                      <li>리드 스틱 8개</li>
+                    </ul>
+                
+                    <p class="desc-note">* 패키지 상자와 선물 포장용 쇼핑백이 함께 제공됩니다.</p>
+                    </div>
+                `
+          }
+        ]
+      },
+      {
+        id: "s2", name: "캔들",
+        options: [
+          { optName: "Mossy Wood", price: 74400,
+            images: [
+              "./assets/Mossy_Wood_Candle.png", 
+              "./assets/scent bag.jpg"
+            ],
+            optDesc: `
+                  <div class="desc-formatted">
+                    <strong class="desc-title">향기로 전하는 품격, Mossy Wood</strong>
+                    <p>그랜드 인터컨티넨탈 서울 파르나스에서 사용하는 시그니처 향으로, 은은하게 퍼지는 풍부한 아이리스 향과 세련된 우디 노트로 럭셔리한 품격을 전합니다.</p>
+
+                    <strong class="desc-subtitle">상품 구성</strong>
+                    <ul>
+                      <li>캔들 본품 220g</li>
+                    </ul>
+                
+                    <p class="desc-note">* 패키지 상자와 선물 포장용 쇼핑백이 함께 제공됩니다.</p>
+                    </div>
+                `
+          },
+          { optName: "Mint Forest", price: 74400,
+            images: [
+              "./assets/Mint_Forest_Candle.png", 
+              "./assets/scent bag.jpg"
+            ],
+            optDesc: `
+                  <div class="desc-formatted">
+                    <strong class="desc-title">공간을 감싸는 고요한 싱그러움, Mint Forest</strong>
+                    <p>파르나스 호텔 제주에서 사용하는 시그니처 향으로, 제주의 맑고 부드러운 바람, 푸른 바다의 감동을 향기로 전합니다.</p>
+
+                    <strong class="desc-subtitle">상품 구성</strong>
+                    <ul>
+                      <li>캔들 본품 220g</li>
+                    </ul>
+                
+                    <p class="desc-note">* 패키지 상자와 선물 포장용 쇼핑백이 함께 제공됩니다.</p>
+                    </div>
+                `
+          },
+          { optName: "White Bloom", price: 74400,
+            images: [
+              "./assets/White_Bloom_Candle.png", 
+              "./assets/scent bag.jpg"
+            ],
+            optDesc: `
+                  <div class="desc-formatted">
+                    <strong class="desc-title">고요함 속에서 피어나는 깊은 평온, White Bloom</strong>
+                    <p>웨스틴 서울 파르나스에서 사용하는 시그니처 향으로, 상쾌한 아침 햇살같은 이탈리안 베르가모트와 포근한 담요처럼 감싸오는 머스크와 앰버의 잔향으로, 잔잔한 활력이 공간을 채웁니다.</p>
+
+                    <strong class="desc-subtitle">상품 구성</strong>
+                    <ul>
+                      <li>캔들 본품 220g</li>
+                    </ul>
+                
+                    <p class="desc-note">* 패키지 상자와 선물 포장용 쇼핑백이 함께 제공됩니다.</p>
+                    </div>
+                `
+          }
+        ]
+      },
+      {
+        id: "s3", name: "룸 스프레이",
+        options: [
+          { optName: "Mossy Wood", price: 70400,
+            images: [
+              "./assets/Mossy_Wood_Roomspray.png", 
+              "./assets/scent bag.jpg"
+            ],
+            optDesc: `
+                  <div class="desc-formatted">
+                    <strong class="desc-title">향기로 전하는 품격, Mossy Wood</strong>
+                    <p>그랜드 인터컨티넨탈 서울 파르나스에서 사용하는 시그니처 향으로, 은은하게 퍼지는 풍부한 아이리스 향과 세련된 우디 노트로 럭셔리한 품격을 전합니다.</p>
+
+                    <strong class="desc-subtitle">상품 구성</strong>
+                    <ul>
+                      <li>룸 스프레이 본품 100ml</li>
+                    </ul>
+                
+                    <p class="desc-note">* 패키지 상자와 선물 포장용 쇼핑백이 함께 제공됩니다.</p>
+                    </div>
+                `
+          },
+          { optName: "Mint Forest", price: 70400,
+            images: [
+              "./assets/Mint_Forest_Roomspray.png", 
+              "./assets/scent bag.jpg"
+            ],
+            optDesc: `
+                  <div class="desc-formatted">
+                    <strong class="desc-title">공간을 감싸는 고요한 싱그러움, Mint Forest</strong>
+                    <p>파르나스 호텔 제주에서 사용하는 시그니처 향으로, 제주의 맑고 부드러운 바람, 푸른 바다의 감동을 향기로 전합니다.</p>
+
+                    <strong class="desc-subtitle">상품 구성</strong>
+                    <ul>
+                      <li>룸 스프레이 본품 100ml</li>
+                    </ul>
+                
+                    <p class="desc-note">* 패키지 상자와 선물 포장용 쇼핑백이 함께 제공됩니다.</p>
+                    </div>
+                `
+          },
+          { optName: "White Bloom", price: 70400,
+            images: [
+              "./assets/White_Bloom_Roomspray.png", 
+              "./assets/scent bag.jpg"
+            ],
+            optDesc: `
+                  <div class="desc-formatted">
+                    <strong class="desc-title">고요함 속에서 피어나는 깊은 평온, White Bloom</strong>
+                    <p>웨스틴 서울 파르나스에서 사용하는 시그니처 향으로, 상쾌한 아침 햇살같은 이탈리안 베르가모트와 포근한 담요처럼 감싸오는 머스크와 앰버의 잔향으로, 잔잔한 활력이 공간을 채웁니다.</p>
+
+                    <strong class="desc-subtitle">상품 구성</strong>
+                    <ul>
+                      <li>룸 스프레이 본품 100ml</li>
+                    </ul>
+                
+                    <p class="desc-note">* 패키지 상자와 선물 포장용 쇼핑백이 함께 제공됩니다.</p>
+                    </div>
+                `
+          }
+        ]
+      }
+    ]
+  },
+  {
+    category: "Premium Bedding (정가 대비 15% 할인)",
+    items: [
+      {
+        id: "b1", name: "구스다운 이불 세트",
+        options: [
+          { optName: "킹사이즈 (King)", price: 1487500,
+            images: [
+              "./assets/Duvet_K.png", 
+              "./assets/package.jpg"
+            ],
+            optDesc: `
+                  <div class="desc-formatted">
+                    <strong class="desc-title">일상을 빛내는 감도 높은 품격</strong>
+                    <p>그랜드 인터컨티넨탈 서울 파르나스의 객실 기준을 준용하되, 그레이 파이핑 디테일과 히든 지퍼를 적용해 가정에서의 사용과 관리가 한층 더 편리하도록 리뉴얼했습니다.</p>
+
+                    <strong class="desc-subtitle">상품 구성</strong>
+                    <ul>
+                      <li>킹사이즈 이불 세트: 220x240cm, 1,200g</li>
+                      <li>구스다운 이불 1개: 폴란드산 구스(솜털 90%, 깃털 10%), 다운프루프</li>
+                      <li>이불 커버 1개: 100수, 순면 사틴 원단</li>
+                      <li>패브릭 패키지 2개</li>
+                    </ul>
+                
+                    <p class="desc-note">* 호텔 자수가 새겨진 보관용 패브릭 패키지에 담겨 제공됩니다.</p>
+                    </div>
+                `
+          },
+          { optName: "퀸사이즈 (Queen)", price: 1428000,
+            images: [
+              "./assets/Duvet_Q.png", 
+              "./assets/package.jpg"
+            ],
+            optDesc: `
+                  <div class="desc-formatted">
+                    <strong class="desc-title">일상을 빛내는 감도 높은 품격</strong>
+                    <p>그랜드 인터컨티넨탈 서울 파르나스의 객실 기준을 준용하되, 그레이 파이핑 디테일과 히든 지퍼를 적용해 가정에서의 사용과 관리가 한층 더 편리하도록 리뉴얼했습니다.</p>
+
+                    <strong class="desc-subtitle">상품 구성</strong>
+                    <ul>
+                      <li>퀸사이즈 이불 세트: 200x230cm, 1,100g</li>
+                      <li>구스다운 이불 1개: 폴란드산 구스(솜털 90%, 깃털 10%), 다운프루프</li>
+                      <li>이불 커버 1개: 100수, 순면 사틴 원단</li>
+                      <li>패브릭 패키지 2개</li>
+                    </ul>
+                
+                    <p class="desc-note">* 호텔 자수가 새겨진 보관용 패브릭 패키지에 담겨 제공됩니다.</p>
+                    </div>
+                `
+          },
+          { optName: "싱글 사이즈 (Single)", price: 1190000,
+            images: [
+              "./assets/Duvet_S.png", 
+              "./assets/package.jpg"
+            ],
+            optDesc: `
+                  <div class="desc-formatted">
+                    <strong class="desc-title">일상을 빛내는 감도 높은 품격</strong>
+                    <p>그랜드 인터컨티넨탈 서울 파르나스의 객실 기준을 준용하되, 그레이 파이핑 디테일과 히든 지퍼를 적용해 가정에서의 사용과 관리가 한층 더 편리하도록 리뉴얼했습니다.</p>
+
+                    <strong class="desc-subtitle">상품 구성</strong>
+                    <ul>
+                      <li>퀸사이즈 이불 세트: 200x230cm, 800g</li>
+                      <li>구스다운 이불 1개: 폴란드산 구스(솜털 90%, 깃털 10%), 다운프루프</li>
+                      <li>이불 커버 1개: 100수, 순면 사틴 원단</li>
+                      <li>패브릭 패키지 2개</li>
+                    </ul>
+                
+                    <p class="desc-note">* 호텔 자수가 새겨진 보관용 패브릭 패키지에 담겨 제공됩니다.</p>
+                    </div>
+                `
+          }
+        ]
+      },
+      {
+        id: "b2", name: "구스다운 베개 세트",
+        options: [
+          { optName: "프리미엄 (50 x 90)", price: 391000,
+            images: [
+              "./assets/Pillow_Premium.png", 
+              "./assets/package.jpg"
+            ],
+            optDesc: `
+                  <div class="desc-formatted">
+                    <strong class="desc-title">일상을 빛내는 감도 높은 품격</strong>
+                    <p>그랜드 인터컨티넨탈 서울 파르나스의 객실 기준을 준용하되, 그레이 파이핑 디테일과 히든 지퍼를 적용해 가정에서의 사용과 관리가 한층 더 편리하도록 리뉴얼했습니다.</p>
+
+                    <strong class="desc-subtitle">상품 구성</strong>
+                    <ul>
+                      <li>프리미엄 베개 세트: 50x90cm, 1,300g</li>
+                      <li>구스다운 베개 1개: 폴란드산 구스(솜털 50%, 깃털 50%), 이중 다운프루프</li>
+                      <li>베개 커버 1개: 100수, 순면 사틴 원단</li>
+                      <li>패브릭 패키지 2개</li>
+                    </ul>
+                
+                    <p class="desc-note">* 호텔 자수가 새겨진 보관용 패브릭 패키지에 담겨 제공됩니다.</p>
+                    </div>
+                `
+          },
+          { optName: "킹 (50 x 70)", price: 335750,
+            images: [
+              "./assets/Pillow_King.png", 
+              "./assets/package.jpg"
+            ],
+            optDesc: `
+                  <div class="desc-formatted">
+                    <strong class="desc-title">일상을 빛내는 감도 높은 품격</strong>
+                    <p>그랜드 인터컨티넨탈 서울 파르나스의 객실 기준을 준용하되, 그레이 파이핑 디테일과 히든 지퍼를 적용해 가정에서의 사용과 관리가 한층 더 편리하도록 리뉴얼했습니다.</p>
+
+                    <strong class="desc-subtitle">상품 구성</strong>
+                    <ul>
+                      <li>킹사이즈 베개 세트: 50x70cm, 1,000g</li>
+                      <li>구스다운 베개 1개: 폴란드산 구스(솜털 50%, 깃털 50%), 이중 다운프루프</li>
+                      <li>베개 커버 1개: 100수, 순면 사틴 원단</li>
+                      <li>패브릭 패키지 2개</li>
+                    </ul>
+                
+                    <p class="desc-note">* 호텔 자수가 새겨진 보관용 패브릭 패키지에 담겨 제공됩니다.</p>
+                    </div>
+                `
+          }
+        ]
+      },
+      {
+        id: "b3", name: "베드 시트",
+        options: [
+          { optName: "킹사이즈 (King)", price: 229500,
+            images: [
+              "./assets/Bed_Sheet_K.png", 
+              "./assets/package.jpg"
+            ],
+            optDesc: `
+                  <div class="desc-formatted">
+                    <strong class="desc-title">일상을 빛내는 감도 높은 품격</strong>
+                    <p>그랜드 인터컨티넨탈 서울 파르나스의 객실 기준을 준용하되, 4면 고무 밴드를 적용해 가정에서의 사용과 관리가 한층 더 편리하도록 리뉴얼했습니다.</p>
+
+                    <strong class="desc-subtitle">상품 구성</strong>
+                    <ul>
+                      <li>킹사이즈 베드 시트 1개(고무줄 타입): 170x200cm</li>
+                      <li>패브릭 패키지 1개</li>
+                    </ul>
+
+                    <p class="desc-note">* 매트리스 높이 최대 38cm까지 사용 가능합니다.</p>
+                    <p class="desc-note">* 호텔 자수가 새겨진 보관용 패브릭 패키지에 담겨 제공됩니다.</p>
+                    </div>
+                `
+          },
+          { optName: "퀸 사이즈 (Queen)", price: 212500,
+            images: [
+              "./assets/Bed_Sheet_Q.png", 
+              "./assets/package.jpg"
+            ],
+            optDesc: `
+                  <div class="desc-formatted">
+                    <strong class="desc-title">일상을 빛내는 감도 높은 품격</strong>
+                    <p>그랜드 인터컨티넨탈 서울 파르나스의 객실 기준을 준용하되, 4면 고무 밴드를 적용해 가정에서의 사용과 관리가 한층 더 편리하도록 리뉴얼했습니다.</p>
+
+                    <strong class="desc-subtitle">상품 구성</strong>
+                    <ul>
+                      <li>퀸사이즈 베드 시트 1개(고무줄 타입): 150x200cm</li>
+                      <li>패브릭 패키지 1개</li>
+                    </ul>
+
+                    <p class="desc-note">* 매트리스 높이 최대 38cm까지 사용 가능합니다.</p>
+                    <p class="desc-note">* 호텔 자수가 새겨진 보관용 패브릭 패키지에 담겨 제공됩니다.</p>
+                    </div>
+                `
+          },
+          { optName: "싱글 사이즈 (Single)", price: 178500,
+            images: [
+              "./assets/Bed_Sheet_S.png", 
+              "./assets/package.jpg"
+            ],
+            optDesc: `
+                  <div class="desc-formatted">
+                    <strong class="desc-title">일상을 빛내는 감도 높은 품격</strong>
+                    <p>그랜드 인터컨티넨탈 서울 파르나스의 객실 기준을 준용하되, 4면 고무 밴드를 적용해 가정에서의 사용과 관리가 한층 더 편리하도록 리뉴얼했습니다.</p>
+
+                    <strong class="desc-subtitle">상품 구성</strong>
+                    <ul>
+                      <li>싱글사이즈 베드 시트 1개(고무줄 타입): 110x200cm</li>
+                      <li>패브릭 패키지 1개</li>
+                    </ul>
+
+                    <p class="desc-note">* 매트리스 높이 최대 38cm까지 사용 가능합니다.</p>
+                    <p class="desc-note">* 호텔 자수가 새겨진 보관용 패브릭 패키지에 담겨 제공됩니다.</p>
+                    </div>
+                `
+          }
+        ]
+      }
+    ]
+  },
+  {
+    category: "Premium Bathwear (정가 대비 15% 할인)",
+    items: [
+      {
+        id: "w1", name: "배스로브",
+        options: [
+          { optName: "기본 세트 (Free Size, White)", price: 157250,
+            images: [
+              "./assets/Bathrobe.png", 
+              "./assets/bathrobe2.jpg"
+            ],
+            optDesc: `
+                  <div class="desc-formatted">
+                    <strong class="desc-title">일상을 빛내는 감도 높은 품격</strong>
+                    <p>그랜드 인터컨티넨탈 서울 파르나스에서 경험할 수 있는 격조 높은 편안함을 일상에서도 누릴 수 있습니다.</p>
+                    <p>세계 최고의 품질을 자랑하는 이집트 기자 원면과 무연사 20수 단사를 사용하여 부드러운 촉감과 포근함, 그리고 뛰어난 흡수력을 자랑합니다.</p>
+
+                    <strong class="desc-subtitle">상품 구성</strong>
+                    <ul>
+                      <li>배스로브: 115cm(Free), 1,100g, 화이트</li>
+                      <li>패키지 상자 1개</li>
+                      <li>섬유조성 및 혼용률: 무연사 20수 단사 면 100%</li>
+                    </ul>
+
+                    <p class="desc-note">* 배스로브는 파르나스호텔 컬렉션의 고급 리본 패키지에 담겨 제공됩니다.</p>
+                    </div>
+                `
+          }
+        ]
+      },
+      {
+        id: "w2", name: "배스 타월(2개입)",
+        options: [
+          { optName: "2개입 세트 (White)", price: 97750,
+            images: [
+              "./assets/Bathtowel.png", 
+              "./assets/bathtowel2.jpg"
+            ],
+            optDesc: `
+                  <div class="desc-formatted">
+                    <strong class="desc-title">일상을 빛내는 감도 높은 품격</strong>
+                    <p>그랜드 인터컨티넨탈 서울 파르나스에서 경험할 수 있는 격조 높은 편안함을 일상에서도 누릴 수 있습니다.</p>
+                    <p>세계 최고의 품질을 자랑하는 인도산 코마사 40수 연사를 사용하여 부드러운 감촉과 뛰어난 흡수력을 자랑하며, 뛰어난 내구성으로 오랜 기간 사용하실 수 있습니다.</p>
+
+                    <strong class="desc-subtitle">상품 구성</strong>
+                    <ul>
+                      <li>배스 타월(2개입): 100x160cm, 880g, 화이트</li>
+                      <li>패키지 상자 1개</li>
+                      <li>섬유조성 및 혼용률: 코마사 40수 연사 면 100%</li>
+                    </ul>
+
+                    <p class="desc-note">* 배스 타월은 파르나스호텔 컬렉션의 고급 리본 패키지에 담겨 제공됩니다.</p>
+                    </div>
+                `
+          }
+        ]
+      },
+      {
+        id: "w3", name: "페이스 타월(3개입)",
+        options: [
+          { optName: "3개입 세트 (White)", price: 67150,
+            images: [
+              "./assets/FaceTowel.png", 
+              "./assets/facetowel2.jpg"
+            ],
+            optDesc: `
+                  <div class="desc-formatted">
+                    <strong class="desc-title">일상을 빛내는 감도 높은 품격</strong>
+                    <p>그랜드 인터컨티넨탈 서울 파르나스에서 경험할 수 있는 격조 높은 편안함을 일상에서도 누릴 수 있습니다.</p>
+                    <p>세계 최고의 품질을 자랑하는 이집트 기자 원면과 무연사 20수 단사를 사용하여 부드러운 촉감과 포근함, 그리고 뛰어난 흡수력을 자랑합니다.</p>
+
+                    <strong class="desc-subtitle">상품 구성</strong>
+                    <ul>
+                      <li>페이스 타월(3개입): 50x80cm, 200g, 화이트</li>
+                      <li>패키지 상자 1개</li>
+                      <li>섬유조성 및 혼용률: 무연사 20수 단사 면 100%</li>
+                    </ul>
+
+                    <p class="desc-note">* 페이스 타월은 파르나스호텔 컬렉션의 고급 리본 패키지에 담겨 제공됩니다.</p>
+                    </div>
+                `
+          }
+        ]
+      }
+    ]
+  }
+];
+
+let cart = []; // 장바구니 배열: { itemObj, optIndex, qty, price }
+let currentItemObj = null; // 현재 상세보기에 열려있는 아이템 객체
+let currentGrandTotal = 0; // 폼 검증을 위한 현재 총 결제 금액
+
+/* =========================================================
+   화면 렌더링 (카테고리 및 아이템 리스트)
+========================================================= */
+const galleryArea = document.getElementById("productGalleryArea");
+const detailTemplate = document.getElementById("detailTemplate");
+
+shopData.forEach(cat => {
+  const section = document.createElement("div");
+  section.innerHTML = `<div class="category-title">${cat.category}</div>`;
+  
+  const listWrapper = document.createElement("div");
+  listWrapper.className = "product-list-wrapper";
+
+  const list = document.createElement("div");
+  list.className = "product-list";
+  
+  cat.items.forEach(item => {
+    const card = document.createElement("div");
+    card.className = "product-card";
+    
+    const basePrice = item.options[0].price.toLocaleString() + "원";
+    const optLabel = item.options.length > 1 ? `<br><span style="font-size:0.8em;color:#888;">(옵션 선택)</span>` : ``;
+    const mainImgSrc = item.options[0].images[0]; 
+
+    card.innerHTML = `
+      <div class="img-container"><img src="${mainImgSrc}" alt="${item.name}"></div>
+      <div class="product-card-title">${item.name}</div>
+      <div style="text-align:center; font-size:0.9em; color:#555; margin-top:4px;">${basePrice}${optLabel}</div>
+    `;
+    
+    card.addEventListener("click", () => openDetailView(item, section, card));
+    list.appendChild(card);
+  });
+  
+  // 좌우 스크롤 버튼 생성 및 이벤트 할당
+  const prevBtn = document.createElement("button");
+  prevBtn.type = "button";
+  prevBtn.className = "scroll-btn prev-btn";
+  prevBtn.innerHTML = "&#10094;";
+  prevBtn.onclick = () => list.scrollBy({ left: -180, behavior: 'smooth' });
+
+  const nextBtn = document.createElement("button");
+  nextBtn.type = "button";
+  nextBtn.className = "scroll-btn next-btn";
+  nextBtn.innerHTML = "&#10095;";
+  nextBtn.onclick = () => list.scrollBy({ left: 180, behavior: 'smooth' });
+
+  listWrapper.appendChild(list);
+  listWrapper.appendChild(prevBtn);
+  listWrapper.appendChild(nextBtn);
+  
+  section.appendChild(listWrapper);
+  
+  const anchor = document.createElement("div");
+  anchor.className = "detail-anchor";
+  section.appendChild(anchor);
+  
+  galleryArea.appendChild(section);
+});
+
+/* =========================================================
+   상세 뷰 로직 & 갤러리 렌더링
+========================================================= */
+const dtlMainImg = document.getElementById("dtlMainImg");
+const dtlThumbList = document.getElementById("dtlThumbList");
+const dtlTitle = document.getElementById("dtlTitle");
+const dtlDesc = document.getElementById("dtlDesc");
+const dtlOptionLabel = document.getElementById("dtlOptionLabel");
+const dtlOptionSelect = document.getElementById("dtlOptionSelect");
+const dtlQty = document.getElementById("dtlQty");
+const dtlPriceCalc = document.getElementById("dtlPriceCalc");
+
+function renderGallery(images) {
+  dtlMainImg.src = images[0];
+  dtlThumbList.innerHTML = "";
+  if (images.length > 1) {
+    images.forEach((imgSrc, idx) => {
+      const thumb = document.createElement("img");
+      thumb.src = imgSrc;
+      thumb.className = idx === 0 ? "thumb-img active" : "thumb-img";
+      thumb.onclick = () => {
+        dtlMainImg.src = imgSrc;
+        document.querySelectorAll('.thumb-img').forEach(t => t.classList.remove('active'));
+        thumb.classList.add('active');
+      }
+      dtlThumbList.appendChild(thumb);
+    });
+  }
+}
+
+function openDetailView(item, sectionEl, cardEl) {
+  currentItemObj = item;
+  
+  document.querySelectorAll('.product-card').forEach(c => c.classList.remove('active'));
+  cardEl.classList.add('active');
+
+  dtlTitle.innerText = item.name;
+  renderGallery(item.options[0].images);
+
+  dtlOptionSelect.innerHTML = "";
+  item.options.forEach((opt, idx) => {
+    const optEl = document.createElement("option");
+    optEl.value = idx;
+    optEl.text = `${opt.optName} (+${opt.price.toLocaleString()}원)`;
+    dtlOptionSelect.appendChild(optEl);
+  });
+  
+  if (item.options.length <= 1) {
+    dtlOptionLabel.style.display = "none";
+    dtlOptionSelect.style.display = "none";
+  } else {
+    dtlOptionLabel.style.display = "block";
+    dtlOptionSelect.style.display = "block";
+  }
+  
+  dtlQty.value = 1;
+  updateDetailPrice();
+
+  const anchor = sectionEl.querySelector('.detail-anchor');
+  anchor.appendChild(detailTemplate);
+  detailTemplate.style.display = "block";
+
+  setTimeout(() => {
+      detailTemplate.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
+
+  }
+
+
+document.getElementById("dtlMinus").addEventListener("click", () => {
+  let currentQty = parseInt(dtlQty.value) || 1;
+  if (currentQty > 1) { dtlQty.value = currentQty - 1; updateDetailPrice(); }
+});
+document.getElementById("dtlPlus").addEventListener("click", () => {
+  let currentQty = parseInt(dtlQty.value) || 1;
+  dtlQty.value = currentQty + 1; updateDetailPrice();
+});
+
+dtlQty.addEventListener("input", () => {
+  let val = parseInt(dtlQty.value);
+  if (!isNaN(val) && val >= 1) updateDetailPrice();
+});
+dtlQty.addEventListener("blur", () => {
+  let val = parseInt(dtlQty.value);
+  if (isNaN(val) || val < 1) { dtlQty.value = 1; updateDetailPrice(); }
+});
+
+dtlOptionSelect.addEventListener("change", () => {
+  const optIdx = parseInt(dtlOptionSelect.value) || 0;
+  renderGallery(currentItemObj.options[optIdx].images);
+  updateDetailPrice();
+});
+
+function updateDetailPrice() {
+  if(!currentItemObj) return;
+  const optIdx = parseInt(dtlOptionSelect.value) || 0; 
+  let qty = parseInt(dtlQty.value);
+  if (isNaN(qty) || qty < 1) qty = 1; 
+  const currentOption = currentItemObj.options[optIdx];
+  
+  if (currentOption.optDesc) {
+    dtlDesc.innerHTML = currentOption.optDesc;
+  } else if (currentItemObj.desc) {
+    dtlDesc.innerHTML = currentItemObj.desc;
+  }
+  
+  dtlPriceCalc.innerText = (currentOption.price * qty).toLocaleString();
+}
+
+/* =========================================================
+   장바구니(Cart) 로직
+========================================================= */
+document.getElementById("btnAddCart").addEventListener("click", () => {
+  const optIdx = parseInt(dtlOptionSelect.value) || 0;
+  let qty = parseInt(dtlQty.value);
+  if (isNaN(qty) || qty < 1) qty = 1;
+  
+  const optionObj = currentItemObj.options[optIdx];
+  const existingIdx = cart.findIndex(c => c.itemId === currentItemObj.id && c.optName === optionObj.optName);
+  
+  if (existingIdx > -1) {
+    cart[existingIdx].qty += qty; 
+  } else {
+    cart.push({
+      itemId: currentItemObj.id,
+      itemName: currentItemObj.name,
+      optName: optionObj.optName,
+      unitPrice: optionObj.price,
+      qty: qty
+    });
+  }
+  
+  if (currentItemObj.options.length <= 1) {
+    alert(`${currentItemObj.name} ${qty}개가 담겼습니다.`);
+  } else {
+    alert(`${currentItemObj.name} [${optionObj.optName}] ${qty}개가 담겼습니다.`);
+  }
+  renderCart();
+});
+
+function renderCart() {
+  const listEl = document.getElementById("cartList");
+  const totalEl = document.getElementById("grandTotal");
+  let html = "";
+  currentGrandTotal = 0;
+
+  if(cart.length === 0) {
+    listEl.innerHTML = `<p style="color:#888; font-size:0.9em;">위에서 상품을 선택해 담아주세요.</p>`;
+    totalEl.innerText = "0";
+    document.getElementById("bankTotalText").innerText = "0";
+    document.getElementById("totalAmountInput").value = 0;
+    return;
+  }
+
+  cart.forEach((c, idx) => {
+    const rowPrice = c.unitPrice * c.qty;
+    currentGrandTotal += rowPrice;
+    
+    const isSingleOption = shopData.some(cat => 
+      cat.items.some(item => item.id === c.itemId && item.options.length <= 1)
+    );
+    const optText = isSingleOption ? `수량: ${c.qty}개` : `옵션: ${c.optName} / 수량: ${c.qty}개`;
+
+    html += `
+      <div class="cart-item">
+        <div class="cart-item-info">
+          <div class="cart-item-title">${c.itemName}</div>
+          <div class="cart-item-opt">${optText}</div>
+        </div>
+        <div class="cart-item-price">${rowPrice.toLocaleString()}원</div>
+        <button type="button" class="btn-delete" onclick="removeCartItem(${idx})">✖</button>
+      </div>
+    `;
+  });
+
+  listEl.innerHTML = html;
+  totalEl.innerText = currentGrandTotal.toLocaleString();
+  
+  // 숨겨진 input 및 계좌이체 텍스트 업데이트
+  document.getElementById("bankTotalText").innerText = currentGrandTotal.toLocaleString();
+  document.getElementById("totalAmountInput").value = currentGrandTotal;
+}
+
+function removeCartItem(idx) {
+  cart.splice(idx, 1);
+  renderCart();
+}
+
+/* =========================================================
+   결제방식 토글, 금액 포맷팅 및 검증 로직 복원
+========================================================= */
+// 숫자 입력 콤마 포맷팅
+function formatWithComma(value){
+  const onlyNumber = (value || "").toString().replace(/[^\d]/g, "");
+  if (!onlyNumber) return "";
+  return parseInt(onlyNumber, 10).toLocaleString();
+}
+
+const depositInput = document.getElementById("depositAmount");
+if (depositInput){
+  depositInput.addEventListener("input", () => {
+    const cursorFromEnd = depositInput.value.length - depositInput.selectionStart;
+    depositInput.value = formatWithComma(depositInput.value);
+    const newPos = Math.max(0, depositInput.value.length - cursorFromEnd);
+    depositInput.setSelectionRange(newPos, newPos);
+  });
+}
+
+document.querySelectorAll(".phone-input").forEach(input => {
+  input.addEventListener("input", () => input.value = input.value.replace(/\D/g, ""));
+});
+
+// Required 속성 토글 함수
+function setReq(el, on){
+  if(!el) return;
+  if(on) el.setAttribute("required", "");
+  else el.removeAttribute("required");
+}
+
+const paySelectEl = document.getElementById("paySelect");
+const depositorEl = document.querySelector('input[name="입금자명"]');
+const cardPhoneEl = document.querySelector('input[name="카드결제 연락처"]');
+
+paySelectEl.addEventListener("change", (e) => {
+  const v = e.target.value;
+  document.getElementById("bankArea").classList.toggle("hidden", v !== "계좌이체");
+  document.getElementById("cardArea").classList.toggle("hidden", v !== "카드결제");
+
+  setReq(depositorEl, v === "계좌이체");
+  setReq(depositInput, v === "계좌이체");
+  setReq(cardPhoneEl, v === "카드결제");
+});
+
+// 초기화
+setReq(depositorEl, false);
+setReq(depositInput, false);
+setReq(cardPhoneEl, false);
+
+// 증빙 토글 복원
+document.getElementById("taxSelect").addEventListener("change", e => {
+  const v = e.target.value;
+  document.getElementById("taxArea").classList.toggle("hidden", v === "");
+  document.getElementById("cashArea").classList.toggle("hidden", v !== "현금영수증");
+  document.getElementById("invoiceArea").classList.toggle("hidden", v !== "세금계산서");
+});
+
+function validateForm() {
+  if (cart.length === 0) {
+    alert("장바구니에 담긴 상품이 없습니다.");
+    return false;
+  }
+
+  const agreeCollect = document.getElementById("agreeCollect").checked;
+  const agreeThirdParty = document.getElementById("agreeThirdParty").checked;
+
+  if (!agreeCollect || !agreeThirdParty) {
+    alert("개인정보 동의(수집·이용 / 제3자 제공)는 필수입니다. 체크 후 제출해주세요.");
+    return false;
+  }
+
+  const pay = document.getElementById("paySelect").value;
+  if (pay === "계좌이체"){
+    const depositor = depositorEl.value.trim();
+    const depositAmountVal = parseInt(depositInput.value.replace(/[^\d]/g,""), 10);
+    
+    if (!depositor){
+      alert("입금자명을 입력해주세요.");
+      return false;
+    }
+    if (!depositAmountVal || depositAmountVal !== currentGrandTotal){
+      alert("입금 금액이 총액과 일치해야 합니다.");
+      return false;
+    }
+  }
+
+  if (pay === "카드결제"){
+    const phone = cardPhoneEl.value.trim();
+    if (!phone){
+      alert("결제 링크 받을 번호를 입력해주세요.");
+      return false;
+    }
+  }
+
+  // 폼 전송용 텍스트 생성
+  let summaryTextLines = cart.map(c => {
+    const isSingleOption = shopData.some(cat => 
+      cat.items.some(item => item.id === c.itemId && item.options.length <= 1)
+    );
+    return isSingleOption ? `- ${c.itemName} x ${c.qty}개 = ${(c.unitPrice*c.qty).toLocaleString()}원` 
+                          : `- ${c.itemName} [${c.optName}] x ${c.qty}개 = ${(c.unitPrice*c.qty).toLocaleString()}원`;
+  });
+
+  const buyer = document.querySelector('input[name="주문자 이름"]').value.trim();
+
+  let summary = 
+`주문자: ${buyer}
+총액: ${currentGrandTotal.toLocaleString()}원
+
+주문 내역:
+${summaryTextLines.join("\n")}`;
+
+  document.getElementById("orderSummaryInput").value = summary;
+
+  return confirm(summary + "\n\n주문 내용이 맞습니까?");
+}
+</script>
+
+</body>
+</html>
