@@ -382,6 +382,7 @@ const shopData = [
     items: [
       {
         id: "s1", name: "디퓨저",
+        thumb: "./assets/diffuser_thumbnail.png",
         options: [
           {
             optName: "Mossy Wood", 
@@ -452,6 +453,7 @@ const shopData = [
       },
       {
         id: "s2", name: "캔들",
+        thumb: "./assets/candle_thumbnail.png",
         options: [
           { optName: "Mossy Wood", price: 74400,
             images: [
@@ -514,6 +516,7 @@ const shopData = [
       },
       {
         id: "s3", name: "룸 스프레이",
+        thumb: "./assets/roomspray_thumbnail.png",
         options: [
           { optName: "Mossy Wood", price: 70400,
             images: [
@@ -661,9 +664,9 @@ const shopData = [
     category: "Premium Goose Down Pillow Set (정가 대비 20% 할인)",
     items: [
       {
-        id: "b2", name: "구스다운 베개 세트",
+        id: "b2_premium", name: "구스다운 베개 세트 (프리미엄)",
         options: [
-          { optName: "프리미엄 (50 x 90)", price: 368000, // ★ 20% 할인가로 가격 수정 필요
+          { optName: "프리미엄 (50 x 90)", price: 368000,
             images: [
               "./assets/Pillow_Premium.png", 
               "./assets/package.png"
@@ -682,7 +685,12 @@ const shopData = [
                     <p class="desc-note">* 호텔 자수가 새겨진 보관용 패브릭 패키지에 담겨 제공됩니다.</p>
                   </div>
                 `
-          },
+          }
+        ]
+      },
+      {
+        id: "b2_king", name: "구스다운 베개 세트 (킹)",
+        options: [
           { optName: "킹 (50 x 70)", price: 316000,
             images: [
               "./assets/Pillow_King.png", 
@@ -821,7 +829,7 @@ shopData.forEach(cat => {
     
     const basePrice = item.options[0].price.toLocaleString() + "원";
     const optLabel = item.options.length > 1 ? `<br><span style="font-size:0.8em;color:#888;">(옵션 선택)</span>` : ``;
-    const mainImgSrc = item.options[0].images[0]; 
+    const mainImgSrc = item.thumb || item.options[0].images[0];
 
     card.innerHTML = `
       <div class="img-container"><img src="${mainImgSrc}" alt="${item.name}"></div>
